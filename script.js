@@ -58,3 +58,41 @@ if (enquiryForm) {
 
 const year = document.querySelector('#year');
 if (year) year.textContent = String(new Date().getFullYear());
+
+
+// Gallery images open in an on-page lightbox instead of navigating to a flyer.
+const galleryLightbox = document.querySelector('#galleryLightbox');
+const galleryLightboxImage = galleryLightbox?.querySelector('.gallery-lightbox-image');
+const galleryLightboxClose = galleryLightbox?.querySelector('.gallery-lightbox-close');
+let galleryPreviousFocus = null;
+
+function closeGalleryLightbox() {
+  if (!galleryLightbox || galleryLightbox.hidden) return;
+  galleryLightbox.hidden = true;
+  galleryLightboxImage.src = '';
+  document.body.classList.remove('gallery-lightbox-open');
+  galleryPreviousFocus?.focus();
+}
+
+document.querySelectorAll('.gallery-item').forEach((item) => {
+  item.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (!galleryLightbox || !galleryLightboxImage) return;
+    const thumbnail = item.querySelector('img');
+    if (!thumbnail) return;
+    galleryPreviousFocus = item;
+    galleryLightboxImage.src = thumbnail.currentSrc || thumbnail.src;
+    galleryLightboxImage.alt = thumbnail.alt || 'Enlarged gallery image';
+    galleryLightbox.hidden = false;
+    document.body.classList.add('gallery-lightbox-open');
+    galleryLightboxClose?.focus();
+  });
+});
+
+galleryLightboxClose?.addEventListener('click', closeGalleryLightbox);
+galleryLightbox?.addEventListener('click', (event) => {
+  if (event.target === galleryLightbox) closeGalleryLightbox();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeGalleryLightbox();
+});
